@@ -24,7 +24,7 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException {
         ArrayList<String> list = new ArrayList<>();
-
+        InetAddress[] iaRemoteAll;
         System.out.println("Enter URL: ");
         Scanner console = new Scanner(System.in);
         String name_url = console.nextLine();
@@ -32,7 +32,7 @@ public class Main {
 
         Integer k = 0;
         Integer d = 0;
-
+        Integer ip = 0;
         try {
             File f = new File("register.txt");
             BufferedReader b = new BufferedReader(new FileReader(f));
@@ -43,10 +43,25 @@ public class Main {
                     k = 1;
                 }
                 domain_name = getDomainName(name_url);
-                if (readLine.contains(domain_name))
+                if (readLine.contains(domain_name)){
                     d = 1;
+                    try {
+                        iaRemoteAll = InetAddress.getAllByName(domain_name);
+                        for (int i = 0; i < iaRemoteAll.length; i++) {
+                            list.add(iaRemoteAll[i].toString());
+                            ip = 1;
+                        }
+                    } catch (UnknownHostException e) {
+                        ip = -1;
+                    }
+                }
+                if (ip == 1) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (readLine.contains(list.get(i)))
+                            System.out.println("IP" + list.get(i) + " is in the file");
+                    }
+                }
             }
-
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -54,25 +69,20 @@ public class Main {
         System.out.println("Domain name is " + domain_name);
 
         if(k == 1){
-            System.out.println("This URL is banned");
+            System.out.println("This URL is banned in the file");
             if(d == 1)
-                System.out.println("This domain is banned");
+                System.out.println("This domain is banned in the file");
         }
         else if (k == 0) {
-            System.out.println("This URL is not banned");
+            System.out.println("This URL is not banned in the file");
             if(d == 0)
-                System.out.println("This domain is not banned");
+                System.out.println("This domain is not banned in the file");
         }
-        try {
-            InetAddress[] iaRemoteAll;
-            iaRemoteAll = InetAddress.getAllByName(domain_name);
-            for (int i = 0; i < iaRemoteAll.length; i++) {
-                System.out.println(iaRemoteAll[i]);
-            }
-        } catch (UnknownHostException e) {
-            //e.printStackTrace();
+        if (ip == 1){
+            for (int i = 0; i < list.size(); i++)
+                System.out.println(list.get(i));
+        }
+        else if (ip == -1)
             System.out.println("IP is blocked in Russia");
-        }
-
     }
 }
